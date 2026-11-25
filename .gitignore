@@ -1,0 +1,7 @@
+/target/
+/gen/
+/sync/
+/data/
+/backups/
+*.bak
+bot-pairing.key
