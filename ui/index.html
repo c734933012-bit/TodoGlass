@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; img-src 'self' data:;" />
+  <title>TodoGlass</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <div id="app" class="glass">
+    <div id="frostLayer" class="frost-layer" aria-hidden="true"><div id="frostImg" class="frost-img"></div><div id="frostHaze" class="frost-haze"></div></div>
+    <header class="titlebar">
+      <div class="titlebar-drag">
+        <span id="appTitle" class="app-title">TodoGlass</span>
+        <span id="activityDot" class="activity-dot" role="img" aria-label="待辦活動" hidden></span>
+      </div>
+      <button id="toggleAdd" class="icon-btn chevron" type="button" title="添加待办">
+        <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>
+      </button>
+      <button id="openSettings" class="icon-btn" type="button" title="设置">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+    </header>
+
+    <section id="addBlock" class="add-block collapsed">
+      <div id="addWrap" class="add-wrap"><input id="addInput" class="add-input" type="text" placeholder="添加待办，回车确认" spellcheck="false" tabindex="-1" /></div>
+      <button id="openRec" class="icon-btn add-plus" type="button" title="常驻任务" tabindex="-1">
+        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+      </button>
+    </section>
+
+    <ul id="list" class="todo-list"></ul>
+
+    <section id="settings" class="settings hidden">
+      <div class="settings-head">
+        <span>设置</span>
+        <button id="closeSettings" class="icon-btn" type="button" title="关闭">
+          <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <div class="panel-body">
+      <label class="field">
+        <span class="field-label">标题文字</span>
+        <input id="titleInput" class="field-input" type="text" maxlength="40" spellcheck="false" placeholder="TodoGlass" />
+      </label>
+      <label class="field">
+        <span class="field-label">雾面 <b id="frostVal">0</b></span>
+        <input id="frostRange" class="range" type="range" min="0" max="100" step="1" />
+      </label>
+      <label class="field">
+        <span class="field-label">圆角 <b id="radiusVal">25</b></span>
+        <input id="radiusRange" class="range" type="range" min="25" max="80" step="1" />
+      </label>
+      <details id="advanced"><summary>同步配對與資料還原</summary>
+      <span id="syncInfo" class="field-note"></span>
+      <button id="reconnect" type="button">重新連線</button>
+      <button id="pair" type="button">顯示 Bot 配對金鑰</button>
+      <input id="pairKey" class="field-input hidden" readonly aria-label="Bot 配對金鑰">
+      <label>還原上一版 <select id="backupFile"><option value="todos.json">待辦清單</option><option value="recurring.json">常駐任務</option><option value="settings.json">設定</option></select></label>
+      <button id="restore" type="button">還原備份</button></details>
+      </div>
+    </section>
+    <section id="recPanel" class="settings rec hidden">
+      <div class="settings-head">
+        <span>常驻任务</span>
+        <button id="closeRec" class="icon-btn" type="button" title="关闭">
+          <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <div class="panel-body">
+        <div class="rec-form">
+          <input id="recText" class="field-input" type="text" maxlength="80" spellcheck="false" placeholder="任务内容" />
+          <div class="rec-row">
+            <input id="recTime" class="field-input rec-time" type="time" value="09:00" />
+            <div id="recDays" class="rec-days"></div>
+          </div>
+          <div class="rec-row rec-actions">
+            <button id="recCancel" class="rec-btn ghost hidden" type="button">取消</button>
+            <button id="recSave" class="rec-btn" type="button">添加</button>
+          </div>
+        </div>
+        <ul id="recList" class="rec-list"></ul>
+      </div>
+    </section>
+  </div>
+  <div id="ctx" class="ctx hidden">
+    <div class="ctx-dots">
+      <button class="tag-pick" data-tag="green" title="绿"><i class="tag-dot green"></i></button>
+      <button class="tag-pick" data-tag="blue" title="蓝"><i class="tag-dot blue"></i></button>
+      <button class="tag-pick" data-tag="yellow" title="黄"><i class="tag-dot yellow"></i></button>
+      <button class="tag-pick" data-tag="red" title="红"><i class="tag-dot red"></i></button>
+    </div>
+    <button class="ctx-clear" data-tag="">清除标记</button>
+  </div>
+  <div id="saveError" class="hidden" role="alert"></div>
+  <canvas id="fx"></canvas>
+  <script src="bridge.js"></script>
+  <script src="lg-map.js"></script>
+  <script src="liquid-glass.js"></script>
+  <script src="fireworks.js"></script>
+  <script src="features.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
